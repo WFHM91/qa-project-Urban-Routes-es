@@ -1,0 +1,24 @@
+# Entorno virtual de Python
+.venv/
+venv/
+ENV/
+env/
+
+# Caché de Python y compilación
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Caché y reportes de Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+
+# Archivos de configuración de PyCharm / IDEs
+.idea/
+.vscode/
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
