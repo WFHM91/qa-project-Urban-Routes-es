@@ -2,7 +2,6 @@ import time
 from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.color import Color
 from selenium.webdriver.support.wait import WebDriverWait
 from data.data import phone_number, card_number, card_code, message_for_driver
 from helpers.retrieve_code import retrieve_phone_code
@@ -11,13 +10,13 @@ from helpers.retrieve_code import retrieve_phone_code
 class UrbanRoutesPage:
     from_field = (By.ID, 'from')
     to_field = (By.ID, 'to')
-    request_taxi_button = (By.CSS_SELECTOR, '.button.round')
+    request_taxi_button = (By.CLASS_NAME, 'round')
     comfort_tariff_icon = (By.XPATH, '//div[@class="tcard-title" and text()= "Comfort"]')
     comfort_tariff_assert = (By.CSS_SELECTOR, '.tariff-cards .tcard.active .tcard-title')
     phone_number_button = (By.XPATH, '//div[@class="np-text" and text()= "Número de teléfono"]')
     phone_number_assert = (By.CSS_SELECTOR, '.np-button.filled .np-text')
     phone_number_field = (By.ID, 'phone')
-    phone_submit_button = (By.CSS_SELECTOR, '.button.full')
+    phone_submit_button = (By.CLASS_NAME, 'full')
     phone_code_field = (By.ID, 'code')
     code_submit_button = (By.XPATH, '//button[@class="button full" and text()= "Confirmar"]')
     payment_method_button = (By.XPATH, '//div[@class="pp-text" and text()= "Método de pago"]')
@@ -31,6 +30,9 @@ class UrbanRoutesPage:
     blanket_and_tissues_switch = (By.XPATH, '//div[@class="tariff-picker shown"]'
                                             '//div[contains(@class, "r-sw-container")][.//div[text()="Manta y pañuelos"]]'
                                             '//span[contains(@class, "slider")]')
+    blanket_and_tissues_switch_assert = (By.XPATH, '//div[@class="tariff-picker shown"]'
+                                                   '//div[contains(@class, "r-sw-container")][.//div[text()="Manta y pañuelos"]]'
+                                                   '//input[@class = "switch-input"]')
     ice_cream_plus_button = (By.XPATH, '//div[@class="tariff-picker shown"]'
                                        '//div[contains(@class, "r-counter-container") and .//div[text()="Helado"]]'
                                        '//div[@class="counter-plus"]')
@@ -87,6 +89,9 @@ class UrbanRoutesPage:
         return self.wait.until(
             EC.visibility_of_element_located(self.comfort_tariff_assert)
         )
+    def set_comfort_tariff(self):
+        self.click_request_taxi_button()
+        self.click_comfort_tariff_icon()
 
     def get_phone_number_button(self):
         return self.wait.until(
@@ -127,6 +132,13 @@ class UrbanRoutesPage:
         return self.wait.until(
             EC.visibility_of_element_located(self.phone_number_assert)
         ).text
+
+    def set_phone_number_and_code(self):
+        self.click_phone_number_button()
+        self.set_phone_number()
+        self.click_phone_submit_button()
+        self.set_phone_code_field()
+        self.click_code_submit_button()
 
     def get_payment_method_button(self):
         return self.wait.until(
@@ -169,6 +181,12 @@ class UrbanRoutesPage:
             EC.element_to_be_clickable(self.payment_method_close_button)
         )
 
+    def set_payment_method(self):
+        self.click_payment_method_button()
+        self.click_add_card_button()
+        self.set_card_number_field()
+        self.click_card_submit_button()
+
     def click_payment_method_close_button(self):
         self.get_payment_method_close_button().click()
 
@@ -191,11 +209,10 @@ class UrbanRoutesPage:
 
     def get_blanket_and_tissues_switch_assert(self):
         time.sleep(0.5)
-        active_color = self.wait.until(
-            EC.visibility_of_element_located(self.blanket_and_tissues_switch)
-        ).value_of_css_property("background-color")
-
-        return Color.from_string(active_color).hex
+        active_switch = self.wait.until(
+            EC.presence_of_element_located(self.blanket_and_tissues_switch_assert)
+        )
+        return active_switch.get_property('checked')
 
     def order_two_ice_creams(self):
         ice_cream = self.wait.until(
